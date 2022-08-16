@@ -7,8 +7,7 @@ terraform {
 }
 
 provider "aws" {
-    region = "us-east-2"
-    profile = "ganesh"  
+    region = "us-east-2"  
 }
 
 resource "aws_vpc" "sailorvpc" {
