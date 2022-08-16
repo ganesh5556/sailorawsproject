@@ -1,0 +1,62 @@
+name: sailor application playbook
+hosts: all
+vars: 
+  TOMACT_HOME: "/u01/middleware/apache-tomcat-9.0.65"
+tasks:
+  - name: install jdk
+    apt:
+      name: "openjdk-11-jdk"
+      state: present
+      update_cache: yes
+    become: yes
+    become_method: sudo
+
+  - name: create dirs
+    file:
+      path: /u01/middleware
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+    become: yes
+    become_method: sudo
+
+  - name: install tomcat 
+    get_url:
+      url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+      dest: /u01/middleware
+
+  - name: unzip tomcat 
+    unarchive:
+      src: /u01/middleware/apache-tomcat-9.0.65.tar.gz
+      dest: /u01/middleware
+      remote_src: true
+
+  - name: install tomcat as a service
+    template:
+      src: tomcat.service.j2
+      dest: /etc/systemd/system/tomcat.service
+    become: yes
+    become_method: sudo
+    notify:
+      - tomcatreload
+  - name: copy war
+    copy:
+      src: target/sailor.war
+      dest: /u01/middleware/apache-tomcat-9.0.65/webapps
+    notify:
+      - tomcatrestart
+
+handlers:
+  - name: tomcatreload
+    service:
+      name: tomcat
+      state: reloaded
+    become: yes
+    become_method: sudo
+
+  - name: tomcatrestart
+    service:
+      name: tomcat
+      state: reloaded
+    become: yes
+    become_method: sudo
