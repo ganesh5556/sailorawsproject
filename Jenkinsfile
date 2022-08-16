@@ -32,13 +32,10 @@ pipeline {
                   terraform init
                   terraform apply --auto-approve
                   terraform output "public_ip" > hosts
+		  terraform destroy
                 '''
             }
         }
-        stage('deploy') {
-            steps {
-                ansiblePlaybook(playbook: 'sailor-playbook.yaml', credentialsId: 'aws_instance_ssh_key', inventory: 'hosts')
-            }
-        }
+       
     }
 }
