@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh '''
                   terraform init
-                  terraform apply --auto-aprove
+                  terraform apply --auto-approve
                   terraform output "public_ip" > hosts
                 '''
             }
